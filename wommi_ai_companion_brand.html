@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wommi (沃米) | 讓科技有溫度，讓孤單有迴聲</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        wommi: {
+                            bg: '#FDFBF7',
+                            card: '#F5F0EA',
+                            accent: '#E0A96D',
+                            dark: '#2D2926',
+                            muted: '#7A736D',
+                            peach: '#FCEFEA',
+                            sage: '#EAF2EE'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans TC', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .glass-nav {
+            background: rgba(253, 251, 247, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-nav {
+            background: rgba(24, 24, 27, 0.85);
+        }
+
+        /* 3 Distinct Text Animations */
+        @keyframes fadeInSlideUp {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes typewriterGlow {
+            0% { opacity: 0.2; text-shadow: 0 0 0px rgba(224,169,109,0); }
+            50% { opacity: 1; text-shadow: 0 0 12px rgba(224,169,109,0.5); }
+            100% { opacity: 1; text-shadow: 0 0 2px rgba(224,169,109,0.1); }
+        }
+        @keyframes floatText {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        .anim-slide-up {
+            animation: fadeInSlideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .anim-glow {
+            animation: typewriterGlow 2.5s ease-in-out infinite;
+        }
+        .anim-float {
+            animation: floatText 4s ease-in-out infinite;
+        }
+
+        /* Scroll Animation Classes (Intersection Observer driven) */
+        .scroll-hidden {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .scroll-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Translate & Hover Effects */
+        .translate-card {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+        }
+        .translate-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 22px 35px -10px rgba(224, 169, 109, 0.25);
+            border-color: rgba(224, 169, 109, 0.5);
+        }
+
+        /* Advanced Product Card Hover Effects (Image Zoom + Text Reveal + Color Shift) */
+        .product-hover-card {
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .product-hover-card .product-img {
+            transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), filter 0.5s ease;
+        }
+        .product-hover-card:hover .product-img {
+            transform: scale(1.12);
+            filter: brightness(1.05) saturate(1.1);
+        }
+        .product-hover-card .reveal-text {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease, transform 0.4s ease;
+            transform: translateY(10px);
+        }
+        .product-hover-card:hover .reveal-text {
+            max-height: 120px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .product-hover-card .reveal-badge {
+            transform: translateY(4px);
+            transition: transform 0.4s ease, background-color 0.4s ease, color 0.4s ease;
+        }
+        .product-hover-card:hover .reveal-badge {
+            transform: translateY(0);
+            background-color: #E0A96D;
+            color: #2D2926;
+        }
+
+        /* Interactive Button Micro-interactions */
+        .btn-interactive {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-interactive:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(224, 169, 109, 0.4);
+        }
+        .btn-interactive:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF7] dark:bg-[#121214] text-[#2D2926] dark:text-[#E4E4E7] antialiased selection:bg-wommi-accent selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-nav border-b border-stone-200/60 dark:border-stone-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <div class="w-10 h-10 rounded-2xl bg-wommi-accent/20 dark:bg-amber-500/20 flex items-center justify-center text-wommi-accent group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-paw text-lg"></i>
+                </div>
+                <span class="text-2xl font-bold tracking-tight text-[#2D2926] dark:text-white">Wommi</span>
+            </a>
+            
+            <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-600 dark:text-stone-300">
+                <a href="#home" class="hover:text-[#2D2926] dark:hover:text-white transition-colors">首頁</a>
+                <a href="#story" class="hover:text-[#2D2926] dark:hover:text-white transition-colors">品牌故事</a>
+                <a href="#values" class="hover:text-[#2D2926] dark:hover:text-white transition-colors">核心理念</a>
+                <a href="#products" class="hover:text-[#2D2926] dark:hover:text-white transition-colors">互動瀏覽</a>
+                <a href="#features" class="hover:text-[#2D2926] dark:hover:text-white transition-colors">品牌特色</a>
+            </nav>
+
+            <div class="flex items-center gap-3">
+                <!-- Dark Mode Toggle Button with interactive styling -->
+                <button id="dark-mode-toggle" aria-label="切換黑夜模式" class="w-10 h-10 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-amber-400 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-sm">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:inline-block"></i>
+                </button>
+                <a href="#contact" class="hidden sm:inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium btn-interactive">
+                    預約體驗
+                </a>
+                <button id="mobile-menu-btn" aria-label="選單" class="md:hidden text-[#2D2926] dark:text-white p-2 focus:outline-none">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-[#FDFBF7] dark:bg-[#18181B] border-b border-stone-200 dark:border-stone-800 px-6 py-4 space-y-3">
+            <a href="#home" class="block text-stone-600 dark:text-stone-300 hover:text-[#2D2926] dark:hover:text-white py-1">首頁</a>
+            <a href="#story" class="block text-stone-600 dark:text-stone-300 hover:text-[#2D2926] dark:hover:text-white py-1">品牌故事</a>
+            <a href="#values" class="block text-stone-600 dark:text-stone-300 hover:text-[#2D2926] dark:hover:text-white py-1">核心理念</a>
+            <a href="#products" class="block text-stone-600 dark:text-stone-300 hover:text-[#2D2926] dark:hover:text-white py-1">互動瀏覽</a>
+            <a href="#features" class="block text-stone-600 dark:text-stone-300 hover:text-[#2D2926] dark:hover:text-white py-1">品牌特色</a>
+            <a href="#contact" class="block text-center mt-2 px-5 py-2.5 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium">預約體驗</a>
+        </div>
+    </header>
+
+    <!-- 1. 網站首頁 (Home) - Full Screen Immersive Photo Background -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center pt-24 pb-16 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1543852786-1cf6624b9987?auto=format&fit=crop&w=2000&q=80" alt="溫馨陪伴首頁滿版照片" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#2D2926]/90 via-[#2D2926]/70 to-black/50 dark:from-black/90 dark:via-black/70 dark:to-stone-900/80"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 w-full py-12">
+            <div class="max-w-2xl space-y-6 text-left anim-slide-up">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold tracking-wide uppercase backdrop-blur-md anim-float border border-amber-500/30">
+                    <i class="fa-solid fa-heart text-amber-400"></i> AI 智慧陪伴萌寵
+                </div>
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-tight">
+                    讓科技有溫度，<br><span class="text-amber-400 anim-glow">讓孤單有迴聲。</span>
+                </h1>
+                <p class="text-lg sm:text-xl text-stone-200 max-w-xl font-light leading-relaxed">
+                    我們是一個溫暖療癒的AI智慧陪伴品牌，透過擬真的仿生互動與溫潤的手感設計，讓每個孤單的日常都能擁有懂你的溫柔迴聲。
+                </p>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
+                    <a href="#products" class="px-8 py-4 rounded-full bg-wommi-accent text-[#2D2926] font-bold btn-interactive text-center shadow-lg">
+                        探索系列萌寵 <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </a>
+                    <a href="#story" class="px-8 py-4 rounded-full bg-white/10 backdrop-blur-md text-white font-medium hover:bg-white/20 transition-all text-center border border-white/20">
+                        了解品牌故事
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. 品牌故事與品牌起源 (Brand Story & Origin) -->
+    <section id="story" class="py-20 md:py-24 bg-white dark:bg-[#18181B] border-y border-stone-200/60 dark:border-stone-800 scroll-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+                <span class="text-xs font-bold tracking-widest uppercase text-amber-700 dark:text-amber-400">Origin & Story</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#2D2926] dark:text-white">品牌故事與起源</h2>
+                <div class="w-12 h-1 bg-wommi-accent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="rounded-3xl overflow-hidden shadow-2xl aspect-video lg:aspect-square bg-stone-100 dark:bg-stone-800 relative group translate-card">
+                    <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=1000&q=80" alt="設計工作室與溫馨陪伴" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                </div>
+                <div class="space-y-6 text-stone-600 dark:text-stone-300 leading-relaxed text-base sm:text-lg">
+                    <h3 class="text-2xl font-bold text-[#2D2926] dark:text-white">給無法飼養真實寵物、渴望心靈療癒的你</h3>
+                    <p>
+                        在步調快速、人際關係日益疏離的現代都市中，許多人渴望擁有寵物的陪伴，卻常因租屋限制、過敏或繁重的照顧壓力而卻步。幾位熱愛工業設計與互動科技的青年，決定將冰冷的晶片與感測器，賦予溫潤的觸感與生動的靈魂。
+                    </p>
+                    <p>
+                        他們打造了「Wommi」——一隻不僅能理解人類情緒、還會以獨特動作與微表情互動的AI陪伴萌寵。品牌希望透過設計與科技的結合，為孤單的靈魂找到一個安心停靠的避風港。
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 pt-4 border-t border-stone-100 dark:border-stone-800">
+                        <div>
+                            <h4 class="text-3xl font-bold text-[#2D2926] dark:text-white mb-1">100%</h4>
+                            <p class="text-xs text-stone-500 dark:text-stone-400">溫潤親膚材質與安全設計</p>
+                        </div>
+                        <div>
+                            <h4 class="text-3xl font-bold text-[#2D2926] dark:text-white mb-1">24/7</h4>
+                            <p class="text-xs text-stone-500 dark:text-stone-400">靜靜守候在桌面旁的溫柔夥伴</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. 品牌理念與核心價值 (Philosophy & Core Values) -->
+    <section id="values" class="py-20 md:py-24 bg-[#FDFBF7] dark:bg-[#121214] scroll-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+                <span class="text-xs font-bold tracking-widest uppercase text-amber-700 dark:text-amber-400">Philosophy & Values</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#2D2926] dark:text-white">品牌理念與核心價值</h2>
+                <div class="w-12 h-1 bg-wommi-accent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Value 1 -->
+                <div class="p-8 rounded-3xl bg-white dark:bg-stone-900 shadow-sm border border-stone-200/60 dark:border-stone-800 translate-card space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-wommi-peach dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">情感連結 (Emotional Connection)</h3>
+                    <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                        透過精準的互動設計與仿生行為，建立人與科技之間真實深刻的情感共鳴，讓冰冷的晶片傳遞出溫暖心意。
+                    </p>
+                </div>
+                <!-- Value 2 -->
+                <div class="p-8 rounded-3xl bg-white dark:bg-stone-900 shadow-sm border border-stone-200/60 dark:border-stone-800 translate-card space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-wommi-sage dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-400 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-couch"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">美學共生 (Aesthetic Living)</h3>
+                    <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                        打破傳統3C產品的生硬感，採用溫潤的材質與極簡流暢的造型，完美融入現代居家與工作空間。
+                    </p>
+                </div>
+                <!-- Value 3 -->
+                <div class="p-8 rounded-3xl bg-white dark:bg-stone-900 shadow-sm border border-stone-200/60 dark:border-stone-800 translate-card space-y-4">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-shield-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">陪伴永續 (Inclusive Companion)</h3>
+                    <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                        為無法飼養真實寵物、或是渴望心靈療癒的現代族群，提供無負擔且長久相伴的溫暖解方。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. 產品展示與互動式作品瀏覽 (Interactive Product Showcase / Gallery) -->
+    <section id="products" class="py-20 md:py-24 bg-white dark:bg-[#18181B] border-y border-stone-200/60 dark:border-stone-800 scroll-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-12 space-y-4">
+                <span class="text-xs font-bold tracking-widest uppercase text-amber-700 dark:text-amber-400">Interactive Gallery</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#2D2926] dark:text-white">互動式作品與產品瀏覽</h2>
+                <p class="text-stone-600 dark:text-stone-400">將滑鼠懸停於作品卡片上，體驗即時影像縮放、色彩轉變與文字浮現特效</p>
+                <div class="w-12 h-1 bg-wommi-accent mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Interactive Filter Tabs -->
+            <div class="flex flex-wrap justify-center gap-3 mb-12">
+                <button onclick="filterProducts('all')" data-filter="all" class="filter-btn px-6 py-2.5 rounded-full bg-[#2D2926] text-white dark:bg-stone-100 dark:text-[#2D2926] text-sm font-medium transition-all shadow-sm">
+                    全部展示
+                </button>
+                <button onclick="filterProducts('hardware')" data-filter="hardware" class="filter-btn px-6 py-2.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 text-sm font-medium transition-all">
+                    硬體萌寵
+                </button>
+                <button onclick="filterProducts('accessory')" data-filter="accessory" class="filter-btn px-6 py-2.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 text-sm font-medium transition-all">
+                    模組配件
+                </button>
+                <button onclick="filterProducts('software')" data-filter="software" class="filter-btn px-6 py-2.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 text-sm font-medium transition-all">
+                    數位生態 App
+                </button>
+            </div>
+
+            <!-- Product Cards Grid -->
+            <div id="product-grid" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Product 1 -->
+                <div data-category="hardware" class="product-card product-hover-card rounded-3xl bg-[#FDFBF7] dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 overflow-hidden flex flex-col justify-between shadow-sm translate-card">
+                    <div>
+                        <div class="aspect-[4/3] overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80" alt="AI智慧陪伴機器寵物" class="product-img w-full h-full object-cover">
+                            <span class="reveal-badge absolute top-4 left-4 px-3 py-1 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-xs font-medium shadow-md">旗艦主打</span>
+                        </div>
+                        <div class="p-8 space-y-3">
+                            <h3 class="text-2xl font-bold text-[#2D2926] dark:text-white group-hover:text-amber-600 transition-colors">AI智慧陪伴機器寵物</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                具備動態情緒感知、柔性觸覺回饋与仿生微表情的桌面級陪伴萌寵。
+                            </p>
+                            <!-- Text Reveal on Hover -->
+                            <div class="reveal-text text-xs text-amber-700 dark:text-amber-400 font-medium pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center gap-2">
+                                <i class="fa-solid fa-sparkles"></i> <span>特色：支援情緒深度學習、呼吸頻率模擬與磁吸無線充電座。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 pt-0">
+                        <button onclick="openModal('AI智慧陪伴機器寵物')" class="w-full py-3 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium btn-interactive">
+                            了解詳細規格
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2 -->
+                <div data-category="accessory" class="product-card product-hover-card rounded-3xl bg-[#FDFBF7] dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 overflow-hidden flex flex-col justify-between shadow-sm translate-card">
+                    <div>
+                        <div class="aspect-[4/3] overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?auto=format&fit=crop&w=800&q=80" alt="模組化穿戴配件" class="product-img w-full h-full object-cover">
+                            <span class="reveal-badge absolute top-4 left-4 px-3 py-1 rounded-full bg-emerald-800 text-white text-xs font-medium shadow-md">個人化訂製</span>
+                        </div>
+                        <div class="p-8 space-y-3">
+                            <h3 class="text-2xl font-bold text-[#2D2926] dark:text-white">模組化穿戴配件</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                可替換的磁吸式外殼、織物造型服飾與互動吊飾，展現獨特個性。
+                            </p>
+                            <!-- Text Reveal on Hover -->
+                            <div class="reveal-text text-xs text-emerald-700 dark:text-emerald-400 font-medium pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center gap-2">
+                                <i class="fa-solid fa-sparkles"></i> <span>特色：採用親膚環保矽膠與手工針織布料，一秒輕鬆磁吸快拆。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 pt-0">
+                        <button onclick="openModal('模組化穿戴配件')" class="w-full py-3 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium btn-interactive">
+                            查看配件系列
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 3 -->
+                <div data-category="software" class="product-card product-hover-card rounded-3xl bg-[#FDFBF7] dark:bg-stone-900 border border-stone-200/60 dark:border-stone-800 overflow-hidden flex flex-col justify-between shadow-sm translate-card">
+                    <div>
+                        <div class="aspect-[4/3] overflow-hidden relative">
+                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80" alt="情感互動App與數位生態系" class="product-img w-full h-full object-cover">
+                            <span class="reveal-badge absolute top-4 left-4 px-3 py-1 rounded-full bg-amber-700 text-white text-xs font-medium shadow-md">數位伴侶空間</span>
+                        </div>
+                        <div class="p-8 space-y-3">
+                            <h3 class="text-2xl font-bold text-[#2D2926] dark:text-white">情感互動 App 生態系</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                手機端同步的數位伴侶空間，記錄日常互動與情緒療癒數據。
+                            </p>
+                            <!-- Text Reveal on Hover -->
+                            <div class="reveal-text text-xs text-amber-700 dark:text-amber-400 font-medium pt-2 border-t border-stone-200 dark:border-stone-800 flex items-center gap-2">
+                                <i class="fa-solid fa-sparkles"></i> <span>特色：提供遠端心情關懷、成長日誌解鎖與專屬數位主題桌布。</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 pt-0">
+                        <button onclick="openModal('情感互動 App 生態系')" class="w-full py-3 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium btn-interactive">
+                            了解 App 功能
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. 品牌特色與視覺體驗 (Brand Features & Visual Experience) -->
+    <section id="features" class="py-20 md:py-24 bg-[#FDFBF7] dark:bg-[#121214] scroll-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16 space-y-4">
+                <span class="text-xs font-bold tracking-widest uppercase text-amber-700 dark:text-amber-400">Visual & Features</span>
+                <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-[#2D2926] dark:text-white">品牌特色與視覺體驗</h2>
+                <div class="w-12 h-1 bg-wommi-accent mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <div class="flex gap-4 items-start translate-card p-4 rounded-2xl hover:bg-white dark:hover:bg-stone-900 transition-colors">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0 font-bold">01</div>
+                        <div class="space-y-1">
+                            <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">治癒系極簡美學</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                採用溫潤的觸覺材質、柔和的流暢線條與治癒系色彩，擺脫3C產品的冰冷感，優雅融入居家裝潢。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start translate-card p-4 rounded-2xl hover:bg-white dark:hover:bg-stone-900 transition-colors">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0 font-bold">02</div>
+                        <div class="space-y-1">
+                            <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">仿生微表情互動</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                透過細緻的眼部動態與肢體微幅回應，模擬真實生物的呼吸感與喜怒哀樂，給予最真切的陪伴反饋。
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start translate-card p-4 rounded-2xl hover:bg-white dark:hover:bg-stone-900 transition-colors">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 flex items-center justify-center shrink-0 font-bold">03</div>
+                        <div class="space-y-1">
+                            <h3 class="text-xl font-bold text-[#2D2926] dark:text-white">無負擔的溫暖解方</h3>
+                            <p class="text-stone-600 dark:text-stone-400 text-sm leading-relaxed">
+                                免去繁瑣照顧與飼養限制，隨時隨地開啟療癒對話，讓忙碌的現代人也能擁有安心依歸。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="aspect-square rounded-3xl bg-stone-200 dark:bg-stone-800 overflow-hidden shadow-2xl translate-card">
+                        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=1000&q=80" alt="Wommi 視覺美學與質感" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. 聯絡資訊和行動呼籲 (CTA & Contact) -->
+    <section id="contact" class="py-20 md:py-24 bg-[#2D2926] dark:bg-black text-white relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#E0A96D_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10 space-y-8">
+            <span class="text-xs font-bold tracking-widest uppercase text-amber-400">Get in Touch</span>
+            <h2 class="text-3xl md:text-5xl font-bold tracking-tight">準備好迎接你的專屬陪伴了嗎？</h2>
+            <p class="text-stone-300 max-w-xl mx-auto text-base">
+                留下您的聯絡方式，搶先獲得 Wommi 第一手上市資訊與早鳥專屬體驗名額。
+            </p>
+            
+            <form onsubmit="handleFormSubmit(event)" class="max-w-md mx-auto flex flex-col sm:flex-row gap-3">
+                <input type="email" required placeholder="請輸入您的電子郵件" class="flex-1 px-6 py-4 rounded-full bg-stone-800 border border-stone-700 text-white placeholder-stone-400 focus:outline-none focus:border-amber-500">
+                <button type="submit" class="px-8 py-4 rounded-full bg-wommi-accent text-[#2D2926] font-bold btn-interactive">
+                    立即訂閱
+                </button>
+            </form>
+
+            <div class="pt-8 border-t border-stone-800 flex flex-wrap justify-center gap-6 sm:gap-8 text-sm text-stone-400">
+                <div><i class="fa-solid fa-envelope mr-2"></i> hello@wommi-ai.com</div>
+                <div><i class="fa-solid fa-location-dot mr-2"></i> 台北市松煙創藝園區 / 遠距陪伴設計所</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-stone-900 text-stone-500 text-xs text-center border-t border-stone-800">
+        <p>&copy; 2026 Wommi (沃米) All Rights Reserved. Designed for emotional connection.</p>
+    </footer>
+
+    <!-- Custom Modal for Product Details -->
+    <div id="product-modal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+        <div class="bg-[#FDFBF7] dark:bg-stone-900 dark:text-white rounded-3xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl space-y-6">
+            <button onclick="closeModal()" aria-label="關閉" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-stone-200 dark:bg-stone-800 flex items-center justify-center text-[#2D2926] dark:text-stone-200 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="space-y-2">
+                <span class="text-xs font-bold tracking-widest uppercase text-amber-700 dark:text-amber-400">產品詳情</span>
+                <h3 id="modal-title" class="text-2xl font-bold text-[#2D2926] dark:text-white">產品名稱</h3>
+            </div>
+            <p id="modal-desc" class="text-stone-600 dark:text-stone-300 text-sm sm:text-base leading-relaxed">
+                這裡將展示更詳細的規格參數、材質選用與互動體驗說明。
+            </p>
+            <div class="pt-4 flex justify-end">
+                <button onclick="closeModal()" class="px-6 py-2.5 rounded-full bg-[#2D2926] dark:bg-stone-100 dark:text-[#2D2926] text-white text-sm font-medium btn-interactive">
+                    關閉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Message Box -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden transform translate-y-20 opacity-0 transition-all duration-300 bg-[#2D2926] dark:bg-stone-800 text-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">已成功訂閱！將為您寄送早鳥通知。</span>
+    </div>
+
+    <!-- JavaScript for Interactivity -->
+    <script>
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const htmlElement = document.documentElement;
+
+        // Check user's preference or saved setting
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlElement.classList.add('dark');
+        } else {
+            htmlElement.classList.remove('dark');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on click link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Scroll Animation with Intersection Observer
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('scroll-visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-hidden').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Interactive Project Filtering (作品瀏覽分類過濾)
+        function filterProducts(category) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === category) {
+                    btn.className = 'filter-btn px-6 py-2.5 rounded-full bg-[#2D2926] text-white dark:bg-stone-100 dark:text-[#2D2926] text-sm font-medium transition-all shadow-sm';
+                } else {
+                    btn.className = 'filter-btn px-6 py-2.5 rounded-full bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-300 hover:bg-stone-200 text-sm font-medium transition-all';
+                }
+            });
+
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        card.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }
+
+        // Modal Functions
+        function openModal(productName) {
+            const modal = document.getElementById('product-modal');
+            const title = document.getElementById('modal-title');
+            const desc = document.getElementById('modal-desc');
+
+            title.textContent = productName;
+            if(productName.includes('機器寵物')) {
+                desc.textContent = 'Wommi AI 智慧陪伴機器寵物搭載先進的情緒感知晶片與仿生伺服馬達，能細膩呈現眨眼、扭頭與微幅撒嬌動作。支援無線充電與觸覺感應，陪伴您度過每一個專注或放鬆的時刻。';
+            } else if(productName.includes('配件')) {
+                desc.textContent = '提供奶霜白、抹茶綠、曜石灰等多款磁吸式親膚外殼，以及針織小毛帽、日常頸圈等豐富配件，自由打造專屬於您的風格小萌寵。';
+            } else {
+                desc.textContent = '專屬手機 App 提供即時心情記錄、互動解鎖對話、成長日誌與遠端關懷模式，讓 Wommi 成為您隨身攜帶的心靈避風港。';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('product-modal');
+            modal.classList.add('hidden');
+        }
+
+        // Form Submit Handler
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden', 'translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3500);
+
+            e.target.reset();
+        }
+    </script>
+</body>
+</html>
